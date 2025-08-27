@@ -16,18 +16,14 @@ app.listen(3000)
 
 let ultimoId = 1
 const usuario_admin = {
-    Id: ultimoId++,
+    id: ultimoId++,
     nome: "admin",
     email: "admin@admin"
 }
 
-let usuario = {
-    id: ultimoId++,
-    nome: "",
-    email: ""
-}
 
-let usuarios = [];
+
+let usuarios = [usuario_admin];
 
 app.get("/usuarios", (req, res) => {
     res.json(usuarios).status(200)
@@ -36,28 +32,49 @@ app.get("/usuarios", (req, res) => {
 
 
 app.post("/usuarios/cadastrar", (req, res) => {
-    console.log(req.body)
-    const {nome, email} = req.body
+    const { nome, email } = req.body;
 
-    
-    
-    if(!nome || !email ) {
-        res.status(400).json("Esta faltando informação!!")
-        return;
+    if (!nome || !email) {
+        return res.status(400).json({ mensagem: "Está faltando informação!" });
     } 
 
-
-    let usuario = {
-        id: ultimoId++,
+    
+    const usuario = {
+        id: ultimoId,
         nome,
         email
+    };
+
+    
+    const existe = usuarios.some(u => u.email === usuario.email);
+    if (existe) {
+        return res.status(400).json({ mensagem: "Email já cadastrado!" });
     }
 
-    if(usuario(email) in usuarios) {
-        res.status(400)
+    usuario.id = ultimoId++
+    
+    usuarios.push(usuario);
+
+    return res.status(201).json({ mensagem: `Foi criado o usuário: ${nome}`, usuario });
+});
+
+app.delete('/usuario/deletar/:id', (req, res) => {
+
+    const id = req.params.id
+    const idNumerico = parseInt(id)
+
+    if(isNaN(idNumerico)) {
+        return res.status(400).json({ mensagem: "Não é um ID valido!"})
+    } 
+
+    const existe = usuarios.findIndex(u => u.id === idNumerico)
+
+    if(existe === -1) {
+        console.log("Este usuario não existe")
+        return res.status(400).json("Este usuario não existe!")
     }
-
-    usuarios.push(usuario)
-
-    return res.status(201).json(`Foi criado o usuario:  ${nome}`)
+    
+    
+    usuarios.splice(existe, 1)
+    return res.status(204).send()
 })
