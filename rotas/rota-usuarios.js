@@ -6,7 +6,7 @@ const roteadorUsers = Router();
 
 roteadorUsers.use(imprimir)
 
-let ultimoId = 1
+
 
 
 

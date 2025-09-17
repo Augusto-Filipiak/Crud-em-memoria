@@ -1,100 +1,83 @@
-let usuarios = []
-let ultimoId = 0
+    import { PrismaClient } from "@prisma/client";
 
-function listarTodosUsuarios(req, res) {
-    console.log("Cheguei no controller");
+    let usuarios = []
+    let ultimoId = 0
 
-    res.status(200).json(usuarios);
-}
+    const prisma = new PrismaClient();
 
-function criarUsuario(req, res) {
-    const { nome, email, idade } = req.body;
-
-    if (!nome || !email) {
-    return res.status(400).json({ mensagem: "Nome e email são obrigatórios" });
-    } 
-
-    const novoUsuario = {
-    nome: nome,
-    email: email,
-    idade: idade,
-    id: ultimoId + 1,
-    };
-
-    usuarios.push(novoUsuario);
-    ultimoId += 1;
-
-    res.status(201).json(novoUsuario.id);
-}
-
-function deletarUsuario(req, res) {
-    const id = req.params.id;
-    const idNumerico = parseInt(id);
-
-    if (isNaN(idNumerico)) {
-    return res
-        .status(400)
-        .json({ mensagem: "ID inválido, precisa ser um numero" });
+    async function listarTodosUsuarios(req, res) {
+        console.log("Cheguei no controller");
+        const allUsers = await prisma.users.findMany()
+        res.status(200).json(allUsers);
     }
 
-    let posicao_do_usuario = usuarios.findIndex(
-    (usuario) => usuario.id === idNumerico
-    );
 
-    if (posicao_do_usuario === -1) {
-    return res.status(404).json({ mensagem: "Usuario nao encontrado" });
+
+    async function criarUsuario(req, res) {
+        const { nome, email, idade } = req.body;
+
+        const novoUsuario = {
+        nome: nome,
+        email: email,
+        idade: idade,
+        };
+
+        const criarUser = await prisma.users.create({
+            data: novoUsuario
+        })
+        
+
+        res.status(201).json(criarUser);
     }
 
-    usuarios.splice(posicao_do_usuario, 1);
-    res.status(204).send();
-}
-
-function atualizarUsuario(req, res) {
-    const id = parseInt(req.params.id);
-
-    if (isNaN(id)) {
-    return res
-        .status(400)
-        .json({ mensagem: "ID inválido, precisa ser um numero" });
-    }
-
-    const usuario = usuarios.find((usuario) => usuario.id === id);
-    if (!usuario) {
-    return res.status(404).json({ mensagem: "Usuario nao encontrado" });
-    }
-
-    const { nome, email } = req.body;
-
-    if (!nome && !email) {
-    return res.status(400).json({ mensagem: "manda pelo menos um dos dados" });
-    }
-
-    console.log(`antes de atualizar ${usuario}`);
-
-    if (email) {
-    let email_existe = usuarios.findIndex((usuario) => usuario.email === email);
-
-    if (email_existe !== -1) {
-        return res.status(409).json({ mensagem: "Email ja cadastrado" });
-    }
-
-    usuario.email = email;
-    console.log(`antes de atualizar EMAIL ${usuario}`);
-    }
-
-  
-    if (nome) {
-    usuario.nome = nome;
-    console.log(`antes de atualizar NOME ${usuario}`);
-    }
-
-    res.status(200).json(usuario);
-}
-
-function listarUsuarioId(req, res) {
+    async function deletarUsuario(req, res) {
+        const id = parseInt(req.params.id);
+        
+        if (isNaN(id)) {
         return res
-    .status(200)
-    .json(usuarios.find((usuario) => usuario.id === parseInt(req.params.id)));
-}
+            .status(400)
+            .json({ mensagem: "ID inválido, precisa ser um numero" });
+        }
 
-export {listarTodosUsuarios, criarUsuario, deletarUsuario, atualizarUsuario, listarUsuarioId};
+        const deletarUser = await prisma.users.delete({
+            where: {
+                id: id
+            }
+        })
+
+    
+        res.status(204).send(deletarUser);
+    }
+
+    
+
+    async function listarUsuarioId(req, res) {
+         const id = parseInt(req.params.id)
+        const findById = await prisma.users.findUnique({where: {id: id}})
+
+            return res
+        .status(200)
+        .json(findById);
+    }
+
+    async function atualizarUsuario(req, res) {
+
+        const id = parseInt(req.params.id)
+
+        let {nome, email, idade} = req.body;
+
+        const updateUser = await prisma.users.update({
+            where: {
+                id: id 
+            },
+            data: {
+                nome: nome,
+                email:email,
+                idade: idade
+            }
+        })
+
+        return res.send(updateUser)
+    }
+
+    export {listarTodosUsuarios, criarUsuario, deletarUsuario,  listarUsuarioId, atualizarUsuario};
