@@ -6,10 +6,6 @@ const roteadorUsers = Router();
 
 roteadorUsers.use(imprimir)
 
-
-
-
-
 roteadorUsers.get("/", (req, res) => {
   listarTodosUsuarios(req, res)
 });
