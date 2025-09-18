@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { verificarAdm, imprimir } from "../auths.js";
+import { verificarAdm, imprimir } from "../middlewares/auths.js";
 import { listarTodosUsuarios, criarUsuario, deletarUsuario, atualizarUsuario, listarUsuarioId } from "../controller/controller-usuarios.js";
 
 const roteadorUsers = Router();

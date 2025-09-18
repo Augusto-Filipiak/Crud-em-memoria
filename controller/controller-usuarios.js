@@ -7,17 +7,18 @@
 
     async function listarTodosUsuarios(req, res) {
         console.log("Cheguei no controller");
+        console.log(req.header)
+        try {
         const allUsers = await prisma.users.findMany()
         res.status(200).json(allUsers);
+        } catch (e) {
+            console.log(e)
+        }   
     }
-
-
 
     async function criarUsuario(req, res) {
         try {
         const { nome, email, idade } = req.body;
-
-        
 
         const novoUsuario = {
         nome: nome,
@@ -61,7 +62,9 @@
         }
     }
 
-    
+    function autenticarUsuario(req, res) {
+                
+    }
 
     async function listarUsuarioId(req, res) {
          const id = parseInt(req.params.id)

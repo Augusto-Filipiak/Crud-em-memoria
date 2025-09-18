@@ -12,6 +12,17 @@ export function verificarAdm(req, res, next) {
     
 } 
 
+export function verifyUser(req, res, next) {
+    console.log("Aqui passou")
+    
+    let headers = req.headers
+    console.log(headers)
+
+    const auth = req.headers.authorization
+    console.log(auth)
+    
+}
+
 export function imprimir(req, res, next) {
     console.log("Chamando API!")
     next()
