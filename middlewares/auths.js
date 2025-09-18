@@ -16,10 +16,14 @@ export function verifyUser(req, res, next) {
     console.log("Aqui passou")
     
     let headers = req.headers
-    console.log(headers)
+    
 
     const auth = req.headers.authorization
     console.log(auth)
+    
+    if(!auth.startsWith('Basic')) {
+        return res.status(400).json({mensagem: "Token precisa ser basic"})
+    }
     
 }
 
